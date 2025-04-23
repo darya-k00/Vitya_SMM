@@ -5,8 +5,10 @@ import requests
 env.read_env()
 
 
-def public_post():
-    pass
+def public_post(posts):
+    for post in posts:
+        if post['social_media'][0] == '@':
+            public_post_tg(post)
 
 
 def public_post_tg(post: dict):
