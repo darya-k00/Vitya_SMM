@@ -15,15 +15,25 @@ def public_post_tg(post: dict):
         f'https://api.telegram.org/bot{token}/sendMessage',
         data={
             'chat_id': post['social_media'],
-            'text': post['text'],            
+            'text': post['text'],
         }
     )
     response.raise_for_status()
 
 
-def public_post_vk(post):    
+def public_post_vk(post: dict):
     api_key = env.str('VK_API_KEY')
-    pass
+    group_id = env.str('GROUP_ID')
+    response = requests.post(
+        'https://api.vk.com/method/wall.post',
+        params={
+            'owner_id': f'-{group_id}',
+            'message': post['text'],
+            'access_token': api_key,
+            'v': '5.199',
+        }
+    )
+    response.raise_for_status()
 
 
 def public_post_ok(post):
