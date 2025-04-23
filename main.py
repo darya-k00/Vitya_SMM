@@ -1,16 +1,12 @@
 import time
-
-
-def get_post():
-    pass
-
-
-def public_post():
-    pass
+from create_post import get_post
+from public_post import public_post
 
 
 def main():
     while True:
+        get_post()
+        public_post()
         time.sleep(60)
 
 if __name__ == "__main__":
