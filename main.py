@@ -7,7 +7,7 @@ def main():
     while True:
         get_post()
         public_post()
-        time.sleep(60)
+        time.sleep(10)
 
 if __name__ == "__main__":
     main()
