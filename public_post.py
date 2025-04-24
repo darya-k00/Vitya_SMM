@@ -48,7 +48,7 @@ def public_post_ok(post):
         "media": [
             {
                 "type": "text",
-                "text": 'Ваш текст поста'  
+                "text":  post['text']  
             }
         ]
     }
