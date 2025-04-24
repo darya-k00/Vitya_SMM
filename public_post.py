@@ -54,9 +54,6 @@ def public_post_ok(post):
     }
     
     attachment_json = json.dumps(attachment)
-
-    signature = f'application_key={app_key}attachment={attachment_json}format=jsongid={group_id}method=mediatopic.posttype=GROUP_THEME{session_key}'
-    sig = signature 
     
     params = {
         'application_key': app_key,
@@ -66,11 +63,9 @@ def public_post_ok(post):
         'method': 'mediatopic.post',
         'type': 'GROUP_THEME',
         'access_token': token,
-        'sig': sig
         }
     
     ok_url = 'https://api.ok.ru/fb.do'
-    response = requests.get(ok_url, data=params)
+    response = requests.post(ok_url, params=params)
     response.raise_for_status()
-    return response.json()
    
