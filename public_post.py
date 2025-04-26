@@ -7,10 +7,15 @@ import re
 env.read_env()
 
 
-def public_post(posts):
+def publiс_posts(posts):
     for post in posts:
-        if post['social_media'][0] == '@':
-            public_post_tg(post)
+        media = post['Ссылка на Google Документ'] 
+        if post['social_media'] == 'tg':
+            public_post_tg(media)
+        elif post['social_media'] == 'vk':
+            public_post_vk(media)
+        elif post['social_media'] == 'ok':
+            public_post_ok(media)
 
 
 def public_post_tg(post: dict):
@@ -51,8 +56,8 @@ def public_post_vk(post: dict):
 
 def public_post_ok(post):
     app_key = env.str('OK_API_KEY')
-    group_id = env.str('OK_GROUP_ID')
-    token = env.str('OK_TOKEN')
+    ok_group_id = env.str('OK_GROUP_ID')
+    ok_token = env.str('OK_TOKEN')
     session_key = env.str('OK_SESSION_KEY')
 
     attachment = {
@@ -65,22 +70,18 @@ def public_post_ok(post):
     }
 
     attachment_json = json.dumps(attachment)
-
-    signature = f'application_key={app_key}attachment={attachment_json}format=jsongid={group_id}method=mediatopic.posttype=GROUP_THEME{session_key}'
-    sig = signature
-
+    
     params = {
         'application_key': app_key,
         'attachment': attachment_json,
         'format': 'json',
-        'gid': group_id,
+        'gid': ok_group_id,
         'method': 'mediatopic.post',
         'type': 'GROUP_THEME',
-        'access_token': token,
-        'sig': sig
+        'access_token': ok_token,
         }
 
     ok_url = 'https://api.ok.ru/fb.do'
-    response = requests.get(ok_url, data=params)
+    response = requests.post(ok_url, params=params)
     response.raise_for_status()
-    return response.json()
+   
