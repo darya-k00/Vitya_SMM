@@ -5,10 +5,15 @@ import json
 env.read_env()
 
 
-def public_post(posts):
+def publiс_posts(posts):
     for post in posts:
-        if post['social_media'][0] == '@':
-            public_post_tg(post)
+        media = post['Ссылка на Google Документ'] 
+        if post['social_media'] == 'tg':
+            public_post_tg(media)
+        elif post['social_media'] == 'vk':
+            public_post_vk(media)
+        elif post['social_media'] == 'ok':
+            public_post_ok(media)
 
 
 def public_post_tg(post: dict):
@@ -40,8 +45,8 @@ def public_post_vk(post: dict):
 
 def public_post_ok(post):
     app_key = env.str('OK_API_KEY')
-    group_id = env.str('OK_GROUP_ID')
-    token = env.str('OK_TOKEN')
+    ok_group_id = env.str('OK_GROUP_ID')
+    ok_token = env.str('OK_TOKEN')
     session_key = env.str('OK_SESSION_KEY')
     
     attachment = {
@@ -59,10 +64,10 @@ def public_post_ok(post):
         'application_key': app_key,
         'attachment': attachment_json,
         'format': 'json',
-        'gid': group_id,
+        'gid': ok_group_id,
         'method': 'mediatopic.post',
         'type': 'GROUP_THEME',
-        'access_token': token,
+        'access_token': ok_token,
         }
     
     ok_url = 'https://api.ok.ru/fb.do'
