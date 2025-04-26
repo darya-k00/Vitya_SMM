@@ -70,7 +70,7 @@ def public_post_ok(post):
     }
 
     attachment_json = json.dumps(attachment)
-    
+
     params = {
         'application_key': app_key,
         'attachment': attachment_json,
@@ -84,4 +84,3 @@ def public_post_ok(post):
     ok_url = 'https://api.ok.ru/fb.do'
     response = requests.post(ok_url, params=params)
     response.raise_for_status()
-   
