@@ -1,5 +1,6 @@
 from environs import env
 import requests
+from create_post import get_text_from_docs
 import json
 import re
 
@@ -9,13 +10,18 @@ env.read_env()
 
 def publiс_posts(posts):
     for post in posts:
-        media = post['Ссылка на Google Документ'] 
+        docs_id = post['Ссылка на Google Документ']
+        post['text'] = get_text_from_docs(docs_id)
+        """
+        Формат post {... 'social_media': 'vk', 'id_media': '230236248', 'Статус': 'В обработке', '': '',
+        'text': {'text': 'Всех с яблочным спасом, всем привет, пока.', 'image_url': {'https://vk.com/photo-230236248_457239020'}}} 
+        """
         if post['social_media'] == 'tg':
-            public_post_tg(media)
+            public_post_tg(post)
         elif post['social_media'] == 'vk':
-            public_post_vk(media)
+            public_post_vk(post)
         elif post['social_media'] == 'ok':
-            public_post_ok(media)
+            public_post_ok(post)
 
 
 def public_post_tg(post: dict):
@@ -32,17 +38,20 @@ def public_post_tg(post: dict):
 
 def public_post_vk(post: dict):
     api_key = env.str('VK_API_KEY')
-    group_id = env.str('GROUP_ID')
+    group_id = post['id_media']
+
+    text = post['text']['text']
 
     attachments = None
-    if 'image_url' in post and post['image_url']:
-        match = re.search(r'photo-(\d+_\d+)', post['image_url'])
+    if 'image_url' in post['text'] and post['text']['image_url']:
+        image_url = post['text']['image_url']
+        match = re.search(r'photo-(\d+_\d+)', str(image_url))
         if match:
             attachments = f'photo-{match.group(1)}'
 
     params = {
         'owner_id': f'-{group_id}',
-        'message': post['text'],
+        'message': text,
         'access_token': api_key,
         'v': '5.199',
     }

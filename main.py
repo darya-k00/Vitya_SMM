@@ -1,12 +1,12 @@
 import time
 from create_post import get_posts
-from public_post import public_post
+from public_post import publiс_posts
 
 
 def main():
     while True:
         posts = get_posts()
-        public_post(posts)
+        publiс_posts(posts)
         time.sleep(10)
 
 
