@@ -3,25 +3,39 @@ import requests
 from create_post import get_text_from_docs
 import json
 import re
+import schedule
+from datetime import datetime
+import pytz
 
 
 env.read_env()
 
 
-def publiс_posts(posts):
+def schedule_posts(posts):
+    tz = pytz.timezone('Asia/Yekaterinburg')
+    time_now = datetime.now(tz)
+
     for post in posts:
-        docs_id = post['Ссылка на Google Документ']
-        post['text'] = get_text_from_docs(docs_id)
-        """
-        Формат post {... 'social_media': 'vk', 'id_media': '230236248', 'Статус': 'В обработке', '': '',
-        'text': {'text': 'Всех с яблочным спасом, всем привет, пока.', 'image_url': {'https://vk.com/photo-230236248_457239020'}}} 
-        """
-        if post['social_media'] == 'tg':
-            public_post_tg(post)
-        elif post['social_media'] == 'vk':
-            public_post_vk(post)
-        elif post['social_media'] == 'ok':
-            public_post_ok(post)
+        date_post = f"{post['Дата']} {post['Время']}"
+        naive_time = datetime.strptime(date_post, '%Y-%m-%d %H:%M')
+        post_time = tz.localize(naive_time)
+
+        if post_time >= time_now:
+            schedule.every().day.at(
+                post_time.strftime('%H:%M'),
+                tz='Asia/Yekaterinburg'
+            ).do(public_post, post)
+
+
+def public_post(post):
+    docs_id = post['Ссылка на Google Документ']
+    post['text'] = get_text_from_docs(docs_id)
+    if post['social_media'] == 'tg':
+        public_post_tg(post)
+    elif post['social_media'] == 'vk':
+        public_post_vk(post)
+    elif post['social_media'] == 'ok':
+        public_post_ok(post)
 
 
 def public_post_tg(post: dict):
