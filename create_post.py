@@ -17,15 +17,18 @@ def get_posts():
     gc = gspread.service_account(filename=Path('google_api.json'))
     url = env.str('SHEET_URL')
     sheet = gc.open_by_url(url)
-    posts = sheet.sheet1.get_all_records(expected_headers=[
-        'Дата',
-        'Время',
-        'Ссылка на Google Документ',
-        'social_media',
-        'id_media',
-        'Статус']
-        )
-    return [post for post in posts if post['Статус'] == 'В обработке']
+    posts = sheet.sheet1.get_all_records(
+        expected_headers=[
+            'ID'
+            'Дата',
+            'Время',
+            'Ссылка на Google Документ',
+            'social_media',
+            'id_media',
+            'Опубликован'
+        ]
+    )
+    return [post for post in posts if post['Опубликован'] == '']
 
 
 def get_text_from_docs(docs_id):
@@ -109,3 +112,12 @@ def validate_post(post: dict):
     if post['social_media'] == 'ok':
         if not post['id_media'].isalnum():
             return 'Некорректный ok id'
+
+
+def change_status_post(post):
+    gc = gspread.service_account(filename=Path('google_api.json'))
+    url = env.str('SHEET_URL')
+    sheet = gc.open_by_url(url)
+    headers = sheet.row_values(1)
+    column_index = headers.index('Опубликован') + 1
+    sheet.sheet1.update_cell(post['ID']+1, column_index, 'Да')

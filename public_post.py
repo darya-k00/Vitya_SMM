@@ -1,6 +1,6 @@
 from environs import env
 import requests
-from create_post import get_text_from_docs
+from create_post import get_text_from_docs, change_status_post
 import json
 import re
 import schedule
@@ -36,6 +36,8 @@ def public_post(post):
         public_post_vk(post)
     elif post['social_media'] == 'ok':
         public_post_ok(post)
+    
+    change_status_post(post)
 
 
 def public_post_tg(post: dict):
