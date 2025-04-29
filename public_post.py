@@ -1,21 +1,41 @@
 from environs import env
 import requests
+from create_post import get_text_from_docs
 import json
 import re
+import schedule
+from datetime import datetime
+import pytz
 
 
 env.read_env()
 
 
-def publiс_posts(posts):
+def schedule_posts(posts):
+    tz = pytz.timezone('Asia/Yekaterinburg')
+    time_now = datetime.now(tz)
+
     for post in posts:
-        media = post['Ссылка на Google Документ'] 
-        if post['social_media'] == 'tg':
-            public_post_tg(media)
-        elif post['social_media'] == 'vk':
-            public_post_vk(media)
-        elif post['social_media'] == 'ok':
-            public_post_ok(media)
+        date_post = f"{post['Дата']} {post['Время']}"
+        naive_time = datetime.strptime(date_post, '%Y-%m-%d %H:%M')
+        post_time = tz.localize(naive_time)
+
+        if post_time >= time_now:
+            schedule.every().day.at(
+                post_time.strftime('%H:%M'),
+                tz='Asia/Yekaterinburg'
+            ).do(public_post, post)
+
+
+def public_post(post):
+    docs_id = post['Ссылка на Google Документ']
+    post['text'] = get_text_from_docs(docs_id)
+    if post['social_media'] == 'tg':
+        public_post_tg(post)
+    elif post['social_media'] == 'vk':
+        public_post_vk(post)
+    elif post['social_media'] == 'ok':
+        public_post_ok(post)
 
 
 def public_post_tg(post: dict):
@@ -32,17 +52,20 @@ def public_post_tg(post: dict):
 
 def public_post_vk(post: dict):
     api_key = env.str('VK_API_KEY')
-    group_id = env.str('GROUP_ID')
+    group_id = post['id_media']
+
+    text = post['text']['text']
 
     attachments = None
-    if 'image_url' in post and post['image_url']:
-        match = re.search(r'photo-(\d+_\d+)', post['image_url'])
+    if 'image_url' in post['text'] and post['text']['image_url']:
+        image_url = post['text']['image_url']
+        match = re.search(r'photo-(\d+_\d+)', str(image_url))
         if match:
             attachments = f'photo-{match.group(1)}'
 
     params = {
         'owner_id': f'-{group_id}',
-        'message': post['text'],
+        'message': text,
         'access_token': api_key,
         'v': '5.199',
     }

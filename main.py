@@ -1,13 +1,15 @@
 import time
 from create_post import get_posts
-from public_post import public_post
+import schedule
+from public_post import schedule_posts
 
 
 def main():
     while True:
         posts = get_posts()
-        public_post(posts)
-        time.sleep(10)
+        schedule_posts(posts)
+        schedule.run_pending()
+        time.sleep(30)
 
 
 if __name__ == "__main__":
