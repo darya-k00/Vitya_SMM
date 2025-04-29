@@ -42,13 +42,22 @@ def public_post(post):
 
 def public_post_tg(post: dict):
     token = env.str('TG_API_KEY')
-    response = requests.post(
-        f'https://api.telegram.org/bot{token}/sendMessage',
-        data={
-            'chat_id': post['social_media'],
-            'text': post['text'],
-        }
-    )
+    if post['text']['image_url']:
+        response = requests.post(
+            f'https://api.telegram.org/bot{token}/sendPhoto',
+            data={
+                'chat_id': post['id_media'],
+                'photo': post['text']['image_url'][0],
+                'caption': post['text']['text']
+            }
+        )
+    # response = requests.post(
+    #     f'https://api.telegram.org/bot{token}/sendMessage',
+    #     data={
+    #         'chat_id': post['social_media'],
+    #         'text': post['text'],
+    #     }
+    # )
     response.raise_for_status()
 
 
@@ -94,7 +103,7 @@ def public_post_ok(post: dict):
         ]
     }
 
-    attachment_json = json.dumps(attachment)
+    attachment_json = json.dumps(list(attachment))
 
     params = {
         'application_key': app_key,

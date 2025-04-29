@@ -19,16 +19,16 @@ def get_posts():
     sheet = gc.open_by_url(url)
     posts = sheet.sheet1.get_all_records(
         expected_headers=[
-            'ID'
+            'ID',
             'Дата',
             'Время',
             'Ссылка на Google Документ',
             'social_media',
             'id_media',
-            'Опубликован'
+            'Опубликован',
         ]
     )
-    return [post for post in posts if post['Опубликован'] == '']
+    return [post for post in posts if post['Опубликован'] == 'Нет']
 
 
 def get_text_from_docs(docs_id):
@@ -82,7 +82,7 @@ def get_text_from_docs(docs_id):
 
     return {
         'text': clean_text,
-        'image_url': all_urls,
+        'image_url': list(all_urls),
     }
 
 
@@ -118,6 +118,6 @@ def change_status_post(post):
     gc = gspread.service_account(filename=Path('google_api.json'))
     url = env.str('SHEET_URL')
     sheet = gc.open_by_url(url)
-    headers = sheet.row_values(1)
+    headers = sheet.worksheet('Лист1').row_values(1)
     column_index = headers.index('Опубликован') + 1
     sheet.sheet1.update_cell(post['ID']+1, column_index, 'Да')
