@@ -77,9 +77,9 @@ def public_post_vk(post: dict):
     response.raise_for_status()
 
 
-def public_post_ok(post):
+def public_post_ok(post: dict):
     app_key = env.str('OK_API_KEY')
-    ok_group_id = env.str('OK_GROUP_ID')
+    ok_group_id = post['id_media']
     ok_token = env.str('OK_TOKEN')
     session_key = env.str('OK_SESSION_KEY')
 
