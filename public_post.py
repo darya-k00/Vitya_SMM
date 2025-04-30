@@ -83,12 +83,19 @@ def public_post_vk(text: str, id_channel: str, url_img: str=''):
     response.raise_for_status()
 
 
-def public_post_ok(post: dict):
+def public_post_ok(text: str, id_channel: str, url_img: str=''):
     app_key = env.str('OK_API_KEY')
-    ok_group_id = post['id_media']
     ok_token = env.str('OK_TOKEN')
     session_key = env.str('OK_SESSION_KEY')
-
+    params = {
+        'application_key': app_key,
+        'attachment': attachment_json,
+        'format': 'json',
+        'gid': id_channel,
+        'method': 'mediatopic.post',
+        'type': 'GROUP_THEME',
+        'access_token': ok_token,
+    }
     attachment = {
         "media": [
             {
@@ -97,19 +104,14 @@ def public_post_ok(post: dict):
             }
         ]
     }
-
-    attachment_json = json.dumps(list(attachment))
-
-    params = {
-        'application_key': app_key,
-        'attachment': attachment_json,
-        'format': 'json',
-        'gid': ok_group_id,
-        'method': 'mediatopic.post',
-        'type': 'GROUP_THEME',
-        'access_token': ok_token,
-        }
-
+    if url_img:
+        attachment['media'].append(
+            {
+                'type': 'photo',
+                'photo': url_img
+            }
+        )  
+    attachment_json = json.dumps(list(attachment))  
     ok_url = 'https://api.ok.ru/fb.do'
-    response = requests.post(ok_url, params=params)
+    response = requests.post(ok_url, data=params)
     response.raise_for_status()
