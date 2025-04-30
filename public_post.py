@@ -63,28 +63,21 @@ def public_post_tg(text: str, id_channel: str, url_img: str=''):
         response.raise_for_status()
 
 
-def public_post_vk(post: dict):
-    api_key = env.str('VK_API_KEY')
-    group_id = post['id_media']
-
-    text = post['text']['text']
-
-    attachments = None
-    if 'image_url' in post['text'] and post['text']['image_url']:
-        image_url = post['text']['image_url']
-        match = re.search(r'photo-(\d+_\d+)', str(image_url))
-        if match:
-            attachments = f'photo-{match.group(1)}'
-
+def public_post_vk(text: str, id_channel: str, url_img: str=''):
+    api_key = env.str('VK_API_KEY')    
     params = {
-        'owner_id': f'-{group_id}',
+        'owner_id': f'-{id_channel}',
         'message': text,
         'access_token': api_key,
         'v': '5.199',
     }
-
-    if attachments:
-        params['attachments'] = attachments
+    
+    attachments = None
+    if url_img:
+        match = re.search(r'photo-(\d+_\d+)', url_img)
+        if match:
+            attachments = f'photo-{match.group(1)}'
+            params['attachments'] = attachments
 
     response = requests.post('https://api.vk.com/method/wall.post', params=params)
     response.raise_for_status()
