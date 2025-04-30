@@ -40,25 +40,27 @@ def public_post(post):
     change_status_post(post)
 
 
-def public_post_tg(post: dict):
+def public_post_tg(text: str, id_channel: str, url_img: str=''):
     token = env.str('TG_API_KEY')
-    if post['text']['image_url']:
+    if url_img:
         response = requests.post(
             f'https://api.telegram.org/bot{token}/sendPhoto',
             data={
-                'chat_id': post['id_media'],
-                'photo': post['text']['image_url'][0],
-                'caption': post['text']['text']
+                'chat_id': id_channel,
+                'photo': url_img,
+                'caption': text
             }
         )
-    # response = requests.post(
-    #     f'https://api.telegram.org/bot{token}/sendMessage',
-    #     data={
-    #         'chat_id': post['social_media'],
-    #         'text': post['text'],
-    #     }
-    # )
-    response.raise_for_status()
+        response.raise_for_status()
+    else:
+        response = requests.post(
+            f'https://api.telegram.org/bot{token}/sendMessage',
+            data={
+                'chat_id': id_channel,
+                'text': text,
+            }
+        )
+        response.raise_for_status()
 
 
 def public_post_vk(post: dict):
