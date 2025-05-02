@@ -31,11 +31,11 @@ def public_post(post):
     docs_id = post['Ссылка на Google Документ']
     post['text'] = get_text_from_docs(docs_id)
     if post['social_media'] == 'tg':
-        public_post_tg(post)
+        public_post_tg(post['text']['text'], post['id_media'], post['text']['image_url'])
     elif post['social_media'] == 'vk':
-        public_post_vk(post)
+        public_post_vk(post['text']['text'], post['id_media'], post['text']['image_url'])
     elif post['social_media'] == 'ok':
-        public_post_ok(post)
+        public_post_ok(post['text']['text'], post['id_media'], post['text']['image_url'])
     
     change_status_post(post)
 
@@ -80,37 +80,4 @@ def public_post_vk(text: str, id_channel: str, url_img: str=''):
             params['attachments'] = attachments
 
     response = requests.post('https://api.vk.com/method/wall.post', params=params)
-    response.raise_for_status()
-
-
-def public_post_ok(text: str, id_channel: str, url_img: str=''):
-    app_key = env.str('OK_API_KEY')
-    ok_token = env.str('OK_TOKEN')    
-    attachment = {
-        "media": [
-            {
-                "type": "text",
-                "text":  text
-            }
-        ]
-    }
-    if url_img:
-        attachment['media'].append(
-            {
-                'type': 'photo',
-                'photo': url_img
-            }
-        )      
-    attachment_json = json.dumps(list(attachment))  
-    params = {
-        'application_key': app_key,
-        'attachment': attachment_json,
-        'format': 'json',
-        'gid': id_channel,
-        'method': 'mediatopic.post',
-        'type': 'GROUP_THEME',
-        'access_token': ok_token,
-    }
-    ok_url = 'https://api.ok.ru/fb.do'
-    response = requests.post(ok_url, data=params)
     response.raise_for_status()
