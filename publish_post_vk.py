@@ -1,17 +1,18 @@
 import requests
+import re
 
 
-def public_post_vk(api_key: str, id_channel: str, text: str='', urls_img: list=[]):
+def publish_post_vk(api_key: str, id_channel: str, text: str='', urls_img: list=[]):
     params = {
         'owner_id': f'-{id_channel}',
         'message': text,
         'access_token': api_key,
         'v': '5.199',
-    }
-    
+    }    
     attachments = None
-    if url_img:
-        match = re.search(r'photo-(\d+_\d+)', url_img)
+    
+    if urls_img[0]:
+        match = re.search(r'photo-(\d+_\d+)', urls_img[0])
         if match:
             attachments = f'photo-{match.group(1)}'
             params['attachments'] = attachments

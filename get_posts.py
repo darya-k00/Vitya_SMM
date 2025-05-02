@@ -13,10 +13,9 @@ from googleapiclient.errors import HttpError
 env.read_env()
 
 
-def get_posts():
-    gc = gspread.service_account(filename=Path('google_api.json'))
-    url = env.str('SHEET_URL')
-    sheet = gc.open_by_url(url)
+def get_posts_from_gsheets(sheet_url: str, filename: str) -> list:
+    gc = gspread.service_account(filename=Path(filename))
+    sheet = gc.open_by_url(sheet_url)
     posts = sheet.sheet1.get_all_records(
         expected_headers=[
             'ID',
@@ -31,7 +30,7 @@ def get_posts():
     return [post for post in posts if post['Опубликован'] == 'Нет']
 
 
-def get_text_from_docs(docs_id):
+def get_media_from_docs(docs_id) -> dict:
     match = re.search(r'/document/d/([a-zA-Z0-9-_]{20,})', docs_id)
     docs_id = match.group(1)
     scopes = ['https://www.googleapis.com/auth/documents.readonly']
@@ -114,10 +113,9 @@ def validate_post(post: dict):
             return 'Некорректный ok id'
 
 
-def change_status_post(post):
+def change_status_post(sheet_url, post_id):
     gc = gspread.service_account(filename=Path('google_api.json'))
-    url = env.str('SHEET_URL')
-    sheet = gc.open_by_url(url)
+    sheet = gc.open_by_url(sheet_url)
     headers = sheet.worksheet('Лист1').row_values(1)
     column_index = headers.index('Опубликован') + 1
-    sheet.sheet1.update_cell(post['ID']+1, column_index, 'Да')
+    sheet.sheet1.update_cell(post_id+1, column_index, 'Да')

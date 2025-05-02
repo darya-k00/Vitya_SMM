@@ -1,7 +1,7 @@
 import requests
 
 
-def public_post_tg(token: str, id_channel: str, text: str='', urls_img: list=[]):
+def publish_post_tg(token: str, id_channel: str, text: str='', urls_img: list=[]):
     if urls_img:
         media = [
             {
