@@ -10,6 +10,7 @@ from working_with_documents import (
     change_status_post, 
     get_posts_from_gsheets,
     validate_post,
+    format_text,
     )
 
 
@@ -40,12 +41,13 @@ def main():
             )
             tz = pytz.timezone(tz_str)
             time_of_publish = tz.localize(time_of_publish)
+            
             if time_of_publish > datetime.now(tz):
                 continue
             
             docs_id = post['Ссылка на Google Документ']
             media = get_media_from_docs(docs_id)
-            text = media['text']
+            text = format_text(media['text'])
             urls_img = media['image_url']
             
             if post['social_media'] == 'tg':

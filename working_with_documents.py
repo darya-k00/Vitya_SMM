@@ -105,3 +105,12 @@ def change_status_post(sheet_url: str, post_id: str, status: str='Да'):
     headers = sheet.worksheet('Лист1').row_values(1)
     column_index = headers.index('Опубликован') + 1
     sheet.sheet1.update_cell(post_id+1, column_index, status)
+    
+
+def format_text(text):
+    try:
+        text = re.sub(r'\s+', ' ', text)        
+        text = text.replace('“', '«').replace('”', '»').replace(' - ', ' – ')
+        return text.strip()
+    except Exception as e:
+        return text
