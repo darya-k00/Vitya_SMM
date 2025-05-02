@@ -1,6 +1,5 @@
 import gspread
 from pathlib import Path
-from environs import env
 import os.path
 import re
 from google.auth.transport.requests import Request
@@ -8,9 +7,6 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
-
-env.read_env()
 
 
 def get_posts_from_gsheets(sheet_url: str, filename: str) -> list:
@@ -85,37 +81,27 @@ def get_media_from_docs(docs_id) -> dict:
     }
 
 
-#FIXME Доделать учитывать [{}]
-def validate_post(post: dict):
-    required_fields = ['Ссылка на Google Документ', 'social_media', 'id_media', 'Статус']
-    for field in required_fields:
-        if field not in post:
-            return f'Отсутствует обязательное поле: {field}'
+def validate_post(post: dict, sheet_url: str) -> bool:
+    fields = [
+        'Дата',
+        'Время',
+        'Ссылка на Google Документ',
+        'social_media',
+        'id_media',
+    ]
+    
+    for field in fields:
+        if not post[field]:
+            status = f'Не указно поле {field}, укажите и измените статус на "Нет"!'
+            change_status_post(sheet_url, post['ID'], status)
+            return False
 
-    if post['Статус'] != 'В обработке':
-        return 'Пост уже опубликован'
-
-    if not post['social_media']:
-        return 'Не указана социальная сеть'
-
-    if post['social_media'] == 'tg':
-        if post['id_media'].startswith('@'):
-            if not post['id_media'][1:].isalnum():
-                return 'Некорректный Telegram id'
-        else:
-            return 'Id канала в tg, должен начинаться с @'
-    if post['social_media'] == 'vk':
-        if not post['id_media'].isalnum():
-            return 'Некорректный vk id'
-
-    if post['social_media'] == 'ok':
-        if not post['id_media'].isalnum():
-            return 'Некорректный ok id'
+    return True
 
 
-def change_status_post(sheet_url, post_id):
+def change_status_post(sheet_url: str, post_id: str, status: str='Да'):
     gc = gspread.service_account(filename=Path('google_api.json'))
     sheet = gc.open_by_url(sheet_url)
     headers = sheet.worksheet('Лист1').row_values(1)
     column_index = headers.index('Опубликован') + 1
-    sheet.sheet1.update_cell(post_id+1, column_index, 'Да')
+    sheet.sheet1.update_cell(post_id+1, column_index, status)

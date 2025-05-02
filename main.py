@@ -5,7 +5,12 @@ import pytz
 from publish_post_tg import publish_post_tg
 from publish_post_ok import publish_post_ok
 from publish_post_vk import publish_post_vk
-from working_with_documents import get_media_from_docs, change_status_post, get_posts_from_gsheets
+from working_with_documents import (
+    get_media_from_docs, 
+    change_status_post, 
+    get_posts_from_gsheets,
+    validate_post,
+    )
 
 
 env.read_env()
@@ -26,8 +31,13 @@ def main():
             time.sleep(60)
             continue
         
-        for post in posts:       
-            time_of_publish = datetime.strptime(f'{post['Дата']} {post['Время']}', '%Y-%m-%d %H:%M')
+        for post in posts:
+            if not validate_post(post, sheet_url):
+                continue     
+            
+            time_of_publish = datetime.strptime(
+                f'{post['Дата']} {post['Время']}', '%Y-%m-%d %H:%M'
+            )
             tz = pytz.timezone(tz_str)
             time_of_publish = tz.localize(time_of_publish)
             if time_of_publish > datetime.now(tz):
