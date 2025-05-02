@@ -8,10 +8,6 @@ dependencies = [
     "environs>=14.1.1",
     "google-api-python-client>=2.169.0",
     "gspread>=6.2.0",
-    "pillow>=11.2.1",
     "pytz>=2025.2",
-    "redis>=6.0.0",
     "requests>=2.32.3",
-    "rq>=2.3.2",
-    "schedule==1.2.2",
 ]
