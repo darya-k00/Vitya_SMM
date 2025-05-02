@@ -6,7 +6,7 @@ import pytz
 from publish_post_tg import publish_post_tg
 from publish_post_ok import publish_post_ok
 from publish_post_vk import publish_post_vk
-from get_posts import get_media_from_docs, change_status_post
+from working_with_documents import get_media_from_docs, change_status_post
 
 
 env.read_env()
