@@ -1,12 +1,11 @@
 from environs import env
 import time
-from get_posts import get_posts_from_gsheets
 from datetime import datetime
 import pytz
 from publish_post_tg import publish_post_tg
 from publish_post_ok import publish_post_ok
 from publish_post_vk import publish_post_vk
-from working_with_documents import get_media_from_docs, change_status_post
+from working_with_documents import get_media_from_docs, change_status_post, get_posts_from_gsheets
 
 
 env.read_env()
